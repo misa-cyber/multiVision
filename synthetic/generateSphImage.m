@@ -17,8 +17,6 @@ function [I,center,rad,ang, Xe]=generateSphImage(sig)
     numSpots=round(randRange([3,15],1)); spotSizes=randRange([15,34],numSpots); spotAmps=randRange(spotAmpRange,numSpots); spotAng=randRange([pi,2*pi],numSpots);
     noiseSpots=round(randRange(sig*[200,400],1)); noiseSizes=[4,12]; 
 
-    
-
     % generate ellipse
     a=randRange(aRange,1); e=randRange(eRange,1); imSize=round(2*(a+pad))*[1,1]; 
     center=imSize/2; b=sqrt(a^2-(e*a)^2); ang=randRange([0,2*pi],1);
@@ -47,14 +45,11 @@ function [I,center,rad,ang, Xe]=generateSphImage(sig)
     I=addEllipse(I,center,[a,b],ang,sphAmp,sphAmpDev);
     
     %add spots
-    %spotStruct(numSpots)=struct();
     for i=1:numSpots
         spotRad=randRange([b/2,b-spotSizes(i)],1); spotCnt=center+ spotRad*[cos(spotAng(i)), sin(spotAng(i))];
         Xi=randomShape(spotCnt,spotSizes(i),7*round(spotSizes(i))); 
-        %pgon1=polyshape(Xi(:,1),Xi(:,2));
+ 
         I=insertShape(I,"FilledPolygon",Xi,"Opacity",0.8,"Color",[spotAmps(i),spotAmps(i),spotAmps(i)]);
-    
-        %spotStruct(i).point=Xi;
     end
     I=rgb2gray(I);
 
@@ -66,15 +61,7 @@ function [I,center,rad,ang, Xe]=generateSphImage(sig)
      
      I=imgaussfilt(I,0.3*sig);
      I=imnoise(I,"gaussian",0,0.1*sig^2/255^2); 
-     I=imnoise(I,'speckle',0.1*sig^2/255^2); 
-     
-     
-    
-    %figure;
-    %imshow(I); hold on; 
-
-
-    
+     I=imnoise(I,'speckle',0.1*sig^2/255^2);     
 end
 
 
@@ -86,7 +73,7 @@ function I=addEllipse(I,cnt,rad,ang,amp,ampDev)
         v1=u1_*cos(ang)*ones(size(sI))-v1_.*sin(ang);
         
         flag=(u1/rad(1)).^2+(v1/rad(2)).^2<=1;
-        I_add=amp*0.75+double(I(i,flag))*0.25; %keep 30% of backgroud to increase noise
+        I_add=amp*0.75+double(I(i,flag))*0.25; %keep 25% of backgroud to increase noise
         I(i,flag)=I_add+ampDev*dot(repmat(uDir,size(sI(flag),2),1)',[u1_*ones(size(sI(flag)));v1_(flag)])/rad(1);
     end
 end
